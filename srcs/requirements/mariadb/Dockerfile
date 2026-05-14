@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-# Copy configuration file with high priority so it overrides default 50-server.cnf
-COPY conf/my.cnf /etc/mysql/mariadb.conf.d/99-custom.cnf
+# Apply custom MariaDB server configuration (bind-address, port, etc.)
+COPY conf/my.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 
 # Copy initialization script
 COPY tools/db_init.sh /usr/local/bin/db_init.sh
