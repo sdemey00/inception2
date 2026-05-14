@@ -1,0 +1,162 @@
+MANDATORY REQUIREMENTS CHECK
+
+1. Project Infrastructure ✅
+	✅ Docker Compose setup
+	✅ Each service in dedicated container
+	✅ Services: NGINX, WordPress+PHP-FPM, MariaDB
+	✅ Virtual Machine based
+
+2. Docker Images ✅
+	✅ NGINX → image name matches service name
+	✅ WordPress → image name matches service name
+	✅ MariaDB → image name matches service name
+	✅ Built from penultimate stable (Debian bookworm)
+	✅ Custom Dockerfiles written (not pulled from DockerHub)
+	✅ All Dockerfiles present and properly configured
+	✅ NO "latest" tag used
+	✅ NO passwords in Dockerfiles
+
+3. NGINX Configuration ✅
+	✅ TLSv1.2 and TLSv1.3 only (hardcoded in nginx.conf)
+	✅ Port 443 only (no HTTP port 80)
+	✅ SSL certificate generated dynamically with ${DOMAIN_NAME}
+	✅ Proper reverse proxy to WordPress
+	✅ No NGINX embedded in WordPress
+	✅ Dynamic domain name support via entrypoint script
+	✅ No "tail -f", "bash", "while true", or infinite loops
+	✅ Proper PID 1 handling with exec nginx -g "daemon off;"
+
+4. WordPress + PHP-FPM ✅
+	✅ PHP-FPM only (no NGINX)
+	✅ WP-CLI installed for setup
+	✅ Volume mounted at /var/www/html
+	✅ Listens on port 9000 (FastCGI)
+	✅ No "tail -f" or background processes
+	✅ Proper PID 1 handling with exec php-fpm8.2 -F
+	✅ Environment variables used for configuration
+	✅ Docker secrets used for passwords
+
+5. MariaDB ✅
+	✅ MariaDB only (no NGINX)
+	✅ Port 3306 (internal network only)
+	✅ Database volume at proper location
+	✅ No "tail -f" or background processes
+	✅ Proper PID 1 handling with exec mysqld_safe
+	✅ Docker secrets used for passwords
+	✅ Two database users configured (admin + regular user)
+
+6. Volumes ✅
+	✅ Named volumes used (NOT bind mounts)
+	✅ db_data → /home/sdemey/data/db via driver_opts
+	✅ wordpress_data → /home/sdemey/data/wordpress via driver_opts
+	✅ Data persists across restarts
+	✅ Proper volume mounting in docker-compose.yml
+
+7. Networking ✅
+	✅ Docker bridge network (inception_net)
+	✅ NO "network: host"
+	✅ NO "links:" or "--link"
+	✅ Services communicate via DNS (service names)
+	✅ NGINX exposes 443; other services internal only
+	✅ Explicit network declaration in compose file
+
+8. Secrets Management ✅
+	✅ Docker Compose secrets used
+	✅ Secrets mounted at /run/secrets/
+	✅ db_password.txt → MariaDB user password
+	✅ db_root_password.txt → MariaDB root password
+	✅ credentials.txt → WordPress admin password
+	✅ NO passwords in .env file
+	✅ NO passwords in Dockerfiles
+	✅ Secrets gitignored
+
+9. Environment Variables ✅
+	✅ .env file used for configuration
+	✅ .env.example provided with template values
+	✅ Non-sensitive variables in .env
+	✅ Sensitive credentials in secrets/
+	✅ Environment substitution in NGINX config (via entrypoint)
+
+10. Domain Name ✅
+	✅ Domain: sdemey.42.fr
+	✅ Configured in hosts
+	✅ Dynamic domain support (uses ${DOMAIN_NAME})
+	✅ Certificate CN matches domain
+
+11. Database Users ✅
+	✅ Admin user: sdemey_admin (✅ does NOT contain "admin" or "Administrator")
+	✅ Regular user: user (editor role)
+	✅ Root user: with password from secrets
+
+12. Container Restart Policy ✅
+	✅ restart: unless-stopped configured for all services
+	✅ Automatic restart on crash
+
+13. Entrypoint Best Practices ✅
+	✅ No infinite loops (tail -f, while true, sleep infinity)
+	✅ Proper PID 1 handling with exec
+	✅ Scripts exit cleanly when services fail
+
+14. Makefile ✅
+	✅ make → build + start
+	✅ make down → stop (preserve data)
+	✅ make clean → remove containers/images
+	✅ make fclean → full reset
+	✅ make re → rebuild
+	✅ make logs → view logs
+	✅ make ps → container status
+	✅ Makefile calls docker compose
+	✅ NO sudo required for fclean
+
+15. Documentation ✅
+	✅ README.md present with all required sections:
+	✅ First line italicized with login
+	✅ Description section
+	✅ Project Architecture (VM vs Docker, Secrets vs Env, etc.)
+	✅ Instructions section
+	✅ Resources section with AI usage
+	✅ USER_DOC.md present with:
+	✅ Services explanation
+	✅ Start/stop instructions
+	✅ Website and admin panel access
+	✅ Credentials management
+	✅ Service status checks
+	✅ Troubleshooting
+	✅ DEV_DOC.md present with:
+	✅ Prerequisites
+	✅ Setup from scratch
+	✅ Build and launch instructions
+	✅ Container management commands
+	✅ Data persistence explanation
+
+16. File Structure ✅
+	/home/sdemey/Desktop/Inception/
+	├── Makefile ✅
+	├── README.md ✅
+	├── USER_DOC.md ✅
+	├── DEV_DOC.md ✅
+	├── secrets/ ✅
+	│   ├── db_password.txt ✅
+	│   ├── db_root_password.txt ✅
+	│   └── credentials.txt ✅
+	└── srcs/ ✅
+		├── .env.example ✅
+		├── docker-compose.yml ✅
+		└── requirements/
+			├── nginx/ ✅
+			│   ├── Dockerfile ✅
+			│   ├── .dockerignore ✅
+			│   ├── conf/nginx.conf ✅
+			│   └── tools/
+			│       ├── nginx_entrypoint.sh ✅
+			│       └── generate_cert.sh ✅
+			├── wordpress/ ✅
+			│   ├── Dockerfile ✅
+			│   ├── .dockerignore ✅
+			│   ├── conf/www.conf ✅
+			│   └── tools/wp_setup.sh ✅
+			└── mariadb/ ✅
+				├── Dockerfile ✅
+				├── .dockerignore ✅
+				├── conf/my.cnf ✅
+				└── tools/db_init.sh ✅
