@@ -2,7 +2,7 @@ LOGIN	:= sdemey
 DATA	:= /home/$(LOGIN)/data
 COMPOSE := docker compose -f srcs/docker-compose.yml
 
-.PHONY: all build up down clean fclean re logs ps
+.PHONY: all build up start down clean fclean re logs ps eval-clean
 
 all: build up
 
@@ -23,12 +23,12 @@ down:
 
 # Stop + remove containers and images
 clean: down
-	docker image prune -af
+	$(COMPOSE) down --rmi local --remove-orphans
 
 # Full clean: containers + images + volumes + data
 fclean: down
-	docker system prune -af --volumes
-	sudo rm -rf $(DATA)/wordpress/* $(DATA)/db/*
+	$(COMPOSE) down --rmi local --volumes --remove-orphans
+	rm -rf $(DATA)/wordpress/* $(DATA)/db/*
 
 # Rebuild everything from scratch
 re: fclean all
@@ -40,10 +40,5 @@ logs:
 ps:
 	$(COMPOSE) ps
 
-# Evaluation helper: reset Docker state completely
-eval-clean:
-	docker stop $$(docker ps -qa) 2>/dev/null || true
-	docker rm $$(docker ps -qa) 2>/dev/null || true
-	docker rmi -f $$(docker images -qa) 2>/dev/null || true
-	docker volume rm $$(docker volume ls -q) 2>/dev/null || true
-	docker network rm $$(docker network ls -q) 2>/dev/null || true
+# Evaluation helper: project-scoped reset
+eval-clean: fclean
