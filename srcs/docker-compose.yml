@@ -91,13 +91,13 @@ networks:
 volumes:
   db_data:
     driver: local
-    # driver_opts:
-    #   type: none
-    #   o: bind
-    #   device: /home/sdemey/data/db
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/sdemey/data/db
   wordpress_data:
     driver: local
-    # driver_opts:
-    #   type: none
-    #   o: bind
-    #   device: /home/sdemey/data/wordpress
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/sdemey/data/wordpress
