@@ -28,7 +28,7 @@ clean: down
 # Full clean: containers + images + volumes + data
 fclean: down
 	$(COMPOSE) down --rmi local --volumes --remove-orphans
-	rm -rf $(DATA)/wordpress/* $(DATA)/db/*
+	rm -rf $(DATA)/wordpress $(DATA)/db
 
 # Rebuild everything from scratch
 re: fclean all
