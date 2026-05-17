@@ -4,18 +4,19 @@ COMPOSE := docker compose -f srcs/docker-compose.yml
 
 .PHONY: all build up start down clean fclean re logs ps eval-clean
 
-all: build up
+all: up
 
-# Create data directories, build images, start containers
+# Create data directories and build images
 build:
 	@mkdir -p $(DATA)/wordpress $(DATA)/db
+	@chmod 755 $(DATA)/wordpress $(DATA)/db
 	$(COMPOSE) build
 
-up:
+up: build
 	$(COMPOSE) up -d
 
 # Alias: build + up
-start: build up
+start: up
 
 # Stop and remove containers (keep volumes and images)
 down:
@@ -28,6 +29,7 @@ clean: down
 # Full clean: containers + images + volumes + data
 fclean: down
 	$(COMPOSE) down --rmi local --volumes --remove-orphans
+	@sudo chown -R $(USER):$(USER) $(DATA) 2>/dev/null || true
 	rm -rf $(DATA)/wordpress $(DATA)/db
 
 # Rebuild everything from scratch
@@ -40,5 +42,12 @@ logs:
 ps:
 	$(COMPOSE) ps
 
-# Evaluation helper: project-scoped reset
-eval-clean: fclean
+nuke:
+	- docker stop $$(docker ps -aq) 2>/dev/null || true
+	- docker rm -f $$(docker ps -aq) 2>/dev/null || true
+	- docker rmi -f $$(docker images -aq) 2>/dev/null || true
+	- docker volume rm $$(docker volume ls -q) 2>/dev/null || true
+	docker network prune -f
+	docker system prune -af --volumes
+	@sudo chown -R $(USER):$(USER) $(DATA) 2>/dev/null || true
+	rm -rf $(DATA)/wordpress $(DATA)/db

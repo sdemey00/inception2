@@ -19,6 +19,8 @@ echo ">> MariaDB is ready."
 if [ ! -f "${WP_PATH}/wp-config.php" ]; then
 	echo ">> Installing WordPress..."
 	
+	mkdir -p ${WP_PATH}
+	
 	# Download WordPress
 	wp core download --path=${WP_PATH} --allow-root
 	
