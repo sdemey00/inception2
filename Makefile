@@ -9,7 +9,7 @@ all: up
 # Create data directories and build images
 build:
 	@mkdir -p $(DATA)/wordpress $(DATA)/db
-	@chmod 755 $(DATA)/wordpress $(DATA)/db
+	@sudo chmod 755 $(DATA)/wordpress $(DATA)/db
 	$(COMPOSE) build
 
 up: build
